@@ -3,6 +3,8 @@ using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using System.Drawing;
 using MonoTouch.CoreGraphics;
+using MonoTouch.ObjCRuntime;
+
 namespace RedPlum
 {
 	public enum MBProgressHUDMode
@@ -224,18 +226,26 @@ namespace RedPlum
 			this.BeginInvokeOnMainThread (() => action());
 		}
 
-		public void Dispose ()
+		protected override void Dispose (bool disposing)
 		{
 			this.Indicator = null;
-			Label.Dispose ();
-			Label = null;
-			DetailsLabel.Dispose ();
-			DetailsLabel = null;
-			GraceTimer.Dispose ();
-			GraceTimer = null;
-			MinShowTimer.Dispose ();
-			MinShowTimer = null;
-			base.Dispose ();
+			if (Label != null) {
+				Label.Dispose ();
+				Label = null;
+			}
+			if (DetailsLabel != null) {
+				DetailsLabel.Dispose ();
+				DetailsLabel = null;
+			}
+			if (GraceTimer != null) {
+				GraceTimer.Dispose ();
+				GraceTimer = null;
+			}
+			if (MinShowTimer != null) {
+				MinShowTimer.Dispose ();
+				MinShowTimer = null;
+			}
+			base.Dispose (disposing);
 		}
 
 		#endregion
@@ -500,7 +510,7 @@ namespace RedPlum
 		{
 			float radius = 10.0f;
 			context.BeginPath ();
-			context.SetGrayFillColor (0.0f, this.Opacity);
+			context.SetFillColor (0.0f, this.Opacity);
 			context.MoveTo (rect.GetMinX () + radius, rect.GetMinY ());
 			context.AddArc (rect.GetMaxX () - radius, rect.GetMinY () + radius, radius, (float)(3 * Math.PI / 2), 0f, false);
 			context.AddArc (rect.GetMaxX () - radius, rect.GetMaxY () - radius, radius, 0, (float)(Math.PI / 2), false);
@@ -530,9 +540,9 @@ namespace RedPlum
 			CGContext context = UIGraphics.GetCurrentContext ();
 			
 			// Draw background
-			context.SetRGBStrokeColor (1.0f, 1.0f, 1.0f, 1.0f);
+			context.SetStrokeColor (1.0f, 1.0f, 1.0f, 1.0f);
 			// white
-			context.SetRGBFillColor (1.0f, 1.0f, 1.0f, 0.1f);
+			context.SetFillColor (1.0f, 1.0f, 1.0f, 0.1f);
 			// translucent white
 			context.SetLineWidth (2.0f);
 			context.FillEllipseInRect (circleRect);
@@ -541,7 +551,7 @@ namespace RedPlum
 			// Draw progress
 			float x = (allRect.Size.Width / 2);
 			float y = (allRect.Size.Height / 2);
-			context.SetRGBFillColor (1.0f, 1.0f, 1.0f, 1.0f);
+			context.SetFillColor (1.0f, 1.0f, 1.0f, 1.0f);
 			// white
 			context.MoveTo (x, y);
 			context.AddArc (x, y, (allRect.Size.Width - 4) / 2, -(float)(Math.PI / 2), (float)(this.Progress * 2 * Math.PI) - (float)(Math.PI / 2), false);
